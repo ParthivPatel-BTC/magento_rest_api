@@ -27,7 +27,7 @@ module Magento
 
       def get_products(page, per_page, filters = {})
         @product_filters = product_visibility_filters + prepare_filters(filters, page, per_page, 2)
-        result, status = get_wrapper('/V1/products?' + product_filters, default_headers)
+        result, status = get_wrapper('/V1/dcapi/products?' + product_filters, default_headers)
         return result, status unless status
         return parse_products(result), status
       end
