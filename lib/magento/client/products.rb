@@ -25,11 +25,11 @@ module Magento
       # To perform a logical AND, specify multiple filter_groups.
       ##=======
 
-      def get_products(page, per_page, filters = {})
-        @product_filters = product_visibility_filters + prepare_filters(filters, page, per_page, 2)
-        result, status = get_wrapper('/V1/dcapi/products?' + product_filters, default_headers)
-        return result, status unless status
-        return parse_products(result), status
+      def get_products(page, per_page, additional_attributes, filters = {})
+        @product_filters = product_visibility_filters + prepare_filters(filters, page, per_page, 2, additional_attributes)
+        products = get_wrapper('/V1/dcapi/products?' + product_filters, default_headers)
+        return [] unless products.present?
+        products.map{|product| product.deep_symbolize_keys}
       end
 
       # Get all filters from magento
@@ -83,7 +83,7 @@ module Magento
       # Get all attributes from attribute set
       def get_attributes_by_attribute_set(attribute_set_id)
         # return [] unless values.present?
-        get_wrapper("V1/products/attribute-sets/#{attribute_set_id}/attributes", default_headers).first || []
+        get_wrapper("V1/products/attribute-sets/#{attribute_set_id}/attributes", default_headers) || []
         # return parse_attributes_by_values(result, values).first
       end
 
@@ -95,10 +95,10 @@ module Magento
 
       # Parse products hash from search products method
       def parse_products(products)
-        return [] unless products['items'].present?
+        return [] unless products.present?
 
         result = products.dup
-        result['items'].each do |item|
+        result.each do |item|
           parse_product!(item)
         end
         result
