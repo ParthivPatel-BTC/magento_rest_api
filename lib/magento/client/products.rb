@@ -25,11 +25,25 @@ module Magento
       # To perform a logical AND, specify multiple filter_groups.
       ##=======
 
-      def get_products(page, per_page, additional_attributes, filters = {})
+      # def api_path(service_name, through_extension)
+      #   case service_name
+      #   when 'products'
+      #     through_extension ? '/V1/dcapi/products?' : '/V1/products?'
+      #   end
+      # end
+
+      def get_products_through_extension(page, per_page, additional_attributes, filters = {})
         @product_filters = product_visibility_filters + prepare_filters(filters, page, per_page, 2, additional_attributes)
         products = get_wrapper('/V1/dcapi/products?' + product_filters, default_headers)
         return [] unless products.present?
         products.map{|product| product.deep_symbolize_keys}
+      end
+
+      def get_products(page, per_page, filters = {}, through_extension = false)
+        @product_filters = product_visibility_filters + prepare_filters(filters, page, per_page, 2)
+        result, status = get_wrapper('/V1/products?' + product_filters, default_headers)
+        return result, status unless status
+        return parse_products(result), status
       end
 
       # Get all filters from magento
@@ -95,10 +109,10 @@ module Magento
 
       # Parse products hash from search products method
       def parse_products(products)
-        return [] unless products.present?
+        return [] unless products['items'].present?
 
         result = products.dup
-        result.each do |item|
+        result['items'].each do |item|
           parse_product!(item)
         end
         result

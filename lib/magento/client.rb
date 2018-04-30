@@ -144,7 +144,7 @@ module Magento
     end
 
     # Prepare search filters e.g. for products search
-    def prepare_filters(filters, page, per_page, filter_group_start_index = 0, additional_attributes)
+    def prepare_filters(filters, page, per_page, filter_group_start_index = 0, additional_attributes = [])
       filter_array = []
       if filters.present?
         filters[:filter_groups].each_with_index do |filter_group, group_index|
