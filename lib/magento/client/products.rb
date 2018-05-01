@@ -25,6 +25,13 @@ module Magento
       # To perform a logical AND, specify multiple filter_groups.
       ##=======
 
+      def get_products_through_extension(page, per_page, additional_attributes, filters = {})
+        @product_filters = product_visibility_filters + prepare_filters(filters, page, per_page, 2, additional_attributes)
+        products = get_wrapper('/V1/dcapi/products?' + product_filters, default_headers).first
+        return [] unless products.present?
+        products.map{|product| product.deep_symbolize_keys}
+      end
+
       def get_products(page, per_page, filters = {})
         @product_filters = product_visibility_filters + prepare_filters(filters, page, per_page, 2)
         result, status = get_wrapper('/V1/products?' + product_filters, default_headers)
