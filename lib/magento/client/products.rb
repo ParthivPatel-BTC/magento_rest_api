@@ -51,7 +51,7 @@ module Magento
 
       # Get all categories from magento
       def get_categories_list
-        get_wrapper('/all/V1/categories', default_headers)
+        get_wrapper('/V1/categories', default_headers)
       end
 
       ## values e.g. [13, 10, 1]
@@ -83,7 +83,7 @@ module Magento
       # Get all attributes from attribute set
       def get_attributes_by_attribute_set(attribute_set_id)
         # return [] unless values.present?
-        get_wrapper("V1/products/attribute-sets/#{attribute_set_id}/attributes", default_headers).first || []
+        get_wrapper("/V1/products/attribute-sets/#{attribute_set_id}/attributes", default_headers).first || []
         # return parse_attributes_by_values(result, values).first
       end
 

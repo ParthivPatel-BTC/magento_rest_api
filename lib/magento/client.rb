@@ -40,7 +40,7 @@ module Magento
 
       raise 'Has not resource host!' if MagentoRestApiRb.resource_host.nil?
 
-      @resource = MagentoRestApiRb.resource_host + "/#{@store_code}"
+      @resource = resource_host(MagentoRestApiRb.resource_host) + "/rest/#{@store_code}"
     end
 
 
@@ -168,6 +168,10 @@ module Magento
       filter_array.join '&'
     end
 
+    def resource_host(resource_host)
+      uri = URI.parse(resource_host)
+      "#{uri.scheme}://#{uri.host}"
+    end
   end
 
 end
