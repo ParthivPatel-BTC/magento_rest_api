@@ -25,15 +25,15 @@ module Magento
       # To perform a logical AND, specify multiple filter_groups.
       ##=======
 
-      def get_products_through_extension(page, per_page, additional_attributes, filters = {})
-        @product_filters = product_visibility_filters + prepare_filters(filters, page, per_page, 2, additional_attributes)
+      def get_products_through_extension(page, per_page, store_id, magento_version, additional_attributes, filters = {})
+        @product_filters = product_visibility_filters(store_id, magento_version) + prepare_filters(filters, page, per_page, 2, additional_attributes)
         products = get_wrapper('/V1/dcapi/products?' + product_filters, default_headers).first
         return [] unless products.present?
         products.map{|product| product.deep_symbolize_keys}
       end
 
-      def get_products(page, per_page, filters = {})
-        @product_filters = product_visibility_filters + prepare_filters(filters, page, per_page, 2)
+      def get_products(page, per_page, store_id, magento_version, filters = {})
+        @product_filters = product_visibility_filters(store_id, magento_version) + prepare_filters(filters, page, per_page, 2)
         result, status = get_wrapper('/V1/products?' + product_filters, default_headers)
         return result, status unless status
         return parse_products(result), status
@@ -57,14 +57,14 @@ module Magento
       end
 
       # Get all categories from magento
-      def get_categories_list
-        get_wrapper('/all/V1/categories', default_headers)
+      def get_categories_list(store_id, magento_version)
+        get_wrapper("/V1/categories#{'?' + specific_store_filters(store_id) if supports_store_filter?(magento_version)}", default_headers)
       end
 
       ## values e.g. [13, 10, 1]
-      def get_product_attribute_values(attribute_id, values = [])
+      def get_product_attribute_values(attribute_id, store_id, magento_version, values = [])
         return [] unless values.present?
-        result, status = get_wrapper("/V1/products/attributes/#{attribute_id}", default_headers)
+        result, status = get_wrapper("/V1/products/attributes/#{attribute_id}#{'?' + specific_store_filters(store_id) if supports_store_filter?(magento_version)}", default_headers)
         return result, status unless status
         return parse_attributes_by_values(result, values).first
       end
@@ -76,8 +76,8 @@ module Magento
       end
 
       # Get configurable products
-      def get_configurable_products(sku)
-        configurable_products = get_wrapper("/V1/configurable-products/#{sku}/children", default_headers).first
+      def get_configurable_products(sku, store_id, magento_version)
+        configurable_products = get_wrapper("/V1/configurable-products/#{sku}/children#{'?' + specific_store_filters(store_id) if supports_store_filter?(magento_version)}", default_headers).first
         return [] unless configurable_products.present?
 
         products = []
@@ -88,9 +88,9 @@ module Magento
       end
 
       # Get all attributes from attribute set
-      def get_attributes_by_attribute_set(attribute_set_id)
+      def get_attributes_by_attribute_set(attribute_set_id, store_id, magento_version)
         # return [] unless values.present?
-        get_wrapper("V1/products/attribute-sets/#{attribute_set_id}/attributes", default_headers).first || []
+        get_wrapper("V1/products/attribute-sets/#{attribute_set_id}/attributes#{'?' + specific_store_filters(store_id) if supports_store_filter?(magento_version)}", default_headers).first || []
         # return parse_attributes_by_values(result, values).first
       end
 
@@ -151,8 +151,8 @@ module Magento
 
       # Default visibility filters for exclude
       # in search disabled products and not visibly
-      def product_visibility_filters
-        "searchCriteria[filter_groups][0][filters][0][field]=status&" +
+      def product_visibility_filters(store_id, magento_version)
+        products_filters = "searchCriteria[filter_groups][0][filters][0][field]=status&" +
         + "searchCriteria[filter_groups][0][filters][0][value]=1&" +
         + "searchCriteria[filter_groups][0][filters][0][conditionType]=eq&" +
         + "searchCriteria[filter_groups][1][filters][0][field]=visibility&" +
@@ -160,8 +160,19 @@ module Magento
         + "searchCriteria[filter_groups][1][filters][0][value]=3&" +
         + "searchCriteria[filter_groups][1][filters][0][value]=4&" +
         + "searchCriteria[filter_groups][1][filters][0][conditionType]=qteq&"
+
+        products_filters = supports_store_filter?(magento_version) ? products_filters + "+ #{specific_store_filters(store_id)}" : products_filters
       end
 
+      def specific_store_filters(store_id)
+        "searchCriteria[filter_groups][0][filters][0][field]=store&" +
+        + "searchCriteria[filter_groups][0][filters][0][value]=#{store_id}&"+
+        + "searchCriteria[filter_groups][0][filters][0][conditionType]=eq"
+      end
+
+      def supports_store_filter?(magento_version)
+        magento_version >= 2.2
+      end
     end
   end
 end
