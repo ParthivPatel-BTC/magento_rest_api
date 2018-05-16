@@ -98,6 +98,10 @@ module Magento
         get_wrapper("/V1/store/storeGroups", default_headers).first
       end
 
+      def get_store_configs
+        get_wrapper("V1/store/storeConfigs", default_headers).first
+      end
+
       private
 
       # Parse products hash from search products method
