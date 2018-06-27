@@ -167,7 +167,7 @@ module Magento
       end
 
       def specific_store_filters(store_id)
-        "searchCriteria[filter_groups][2][filters][0][field]=store&"+
+        +"searchCriteria[filter_groups][2][filters][0][field]=store&"+
         +"searchCriteria[filter_groups][2][filters][0][value]=#{store_id}&"+
         +"searchCriteria[filter_groups][2][filters][0][condition_type]=eq&"
       end
