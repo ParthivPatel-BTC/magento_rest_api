@@ -156,22 +156,20 @@ module Magento
       # Default visibility filters for exclude
       # in search disabled products and not visibly
       def product_visibility_filters(store_id, magento_version)
-        products_filters = "searchCriteria[filter_groups][0][filters][0][field]=status&" +
-        + "searchCriteria[filter_groups][0][filters][0][value]=1&" +
-        + "searchCriteria[filter_groups][0][filters][0][conditionType]=eq&" +
-        + "searchCriteria[filter_groups][1][filters][0][field]=visibility&" +
-        + "searchCriteria[filter_groups][1][filters][0][value]=2&" +
-        + "searchCriteria[filter_groups][1][filters][0][value]=3&" +
-        + "searchCriteria[filter_groups][1][filters][0][value]=4&" +
-        + "searchCriteria[filter_groups][1][filters][0][conditionType]=qteq&"
+        products_filters = "searchCriteria[filter_groups][0][filters][0][field]=status&"+
+                          +"searchCriteria[filter_groups][0][filters][0][value]=1&"+
+                          +"searchCriteria[filter_groups][0][filters][0][condition_type]=eq&"+
+                          +"searchCriteria[filter_groups][1][filters][0][field]=visibility&"+
+                          +"searchCriteria[filter_groups][1][filters][0][value]=2,3,4&"+
+                          +"searchCriteria[filter_groups][1][filters][0][condition_type]=in&"
 
         products_filters = supports_store_filter?(magento_version) ? products_filters + "#{specific_store_filters(store_id)}" : products_filters
       end
 
       def specific_store_filters(store_id)
-        "searchCriteria[filter_groups][0][filters][0][field]=store&"+
-        + "searchCriteria[filter_groups][0][filters][0][value]=#{store_id}&"+
-        + "searchCriteria[filter_groups][0][filters][0][conditionType]=eq&"
+        "searchCriteria[filter_groups][2][filters][0][field]=store&"+
+        +"searchCriteria[filter_groups][2][filters][0][value]=#{store_id}&"+
+        +"searchCriteria[filter_groups][2][filters][0][condition_type]=eq&"
       end
 
       def supports_store_filter?(magento_version)
