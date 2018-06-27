@@ -165,13 +165,13 @@ module Magento
         + "searchCriteria[filter_groups][1][filters][0][value]=4&" +
         + "searchCriteria[filter_groups][1][filters][0][conditionType]=qteq&"
 
-        products_filters = supports_store_filter?(magento_version) ? products_filters + "+ #{specific_store_filters(store_id)}" : products_filters
+        products_filters = supports_store_filter?(magento_version) ? products_filters + "#{specific_store_filters(store_id)}" : products_filters
       end
 
       def specific_store_filters(store_id)
-        "searchCriteria[filter_groups][0][filters][0][field]=store&" +
+        "searchCriteria[filter_groups][0][filters][0][field]=store&"+
         + "searchCriteria[filter_groups][0][filters][0][value]=#{store_id}&"+
-        + "searchCriteria[filter_groups][0][filters][0][conditionType]=eq"
+        + "searchCriteria[filter_groups][0][filters][0][conditionType]=eq&"
       end
 
       def supports_store_filter?(magento_version)
