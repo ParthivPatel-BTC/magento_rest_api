@@ -167,11 +167,5 @@ module Magento
       filter_array.push("searchCriteria[currentPage]=#{page}") if page.present?
       filter_array.join '&'
     end
-
-    def resource_host(resource_host)
-      uri = URI.parse(resource_host)
-      "#{uri.scheme}://#{uri.host}"
-    end
   end
-
 end
