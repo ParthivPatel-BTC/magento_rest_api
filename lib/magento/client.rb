@@ -39,8 +39,7 @@ module Magento
       @store_code = store_code || MagentoRestApiRb.default_store_code
 
       raise 'Has not resource host!' if MagentoRestApiRb.resource_host.nil?
-
-      @resource = resource_host(MagentoRestApiRb.resource_host) + "/rest/#{@store_code}"
+      @resource = MagentoRestApiRb.resource_host + "/#{@store_code}"
     end
 
 
